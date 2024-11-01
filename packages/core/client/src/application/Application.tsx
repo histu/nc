@@ -31,8 +31,6 @@ import { SchemaInitializer, SchemaInitializerManager } from './schema-initialize
 import * as schemaInitializerComponents from './schema-initializer/components';
 import { SchemaSettings, SchemaSettingsManager } from './schema-settings';
 import { compose, normalizeContainer } from './utils';
-import { defineGlobalDeps } from './utils/globalDeps';
-import { getRequireJs } from './utils/requirejs';
 
 import { CollectionFieldInterfaceComponentOption } from '../data-source/collection-field-interface/CollectionFieldInterface';
 import { CollectionField } from '../data-source/collection-field/CollectionField';
@@ -44,13 +42,6 @@ import type { CollectionFieldInterfaceFactory } from '../data-source';
 import { OpenModeProvider } from '../modules/popup/OpenModeProvider';
 import { AppSchemaComponentProvider } from './AppSchemaComponentProvider';
 import type { Plugin } from './Plugin';
-import type { RequireJS } from './utils/requirejs';
-
-declare global {
-  interface Window {
-    define: RequireJS['define'];
-  }
-}
 
 export type DevDynamicImport = (packageName: string) => Promise<{ default: typeof Plugin }>;
 export type ComponentAndProps<T = any> = [ComponentType, T];
@@ -91,7 +82,6 @@ export class Application {
   public pluginManager: PluginManager;
   public pluginSettingsManager: PluginSettingsManager;
   public devDynamicImport: DevDynamicImport;
-  public requirejs: RequireJS;
   public notification;
   public schemaInitializerManager: SchemaInitializerManager;
   public schemaSettingsManager: SchemaSettingsManager;
@@ -111,7 +101,6 @@ export class Application {
   }
 
   constructor(protected options: ApplicationOptions = {}) {
-    this.initRequireJs();
     define(this, {
       maintained: observable.ref,
       loading: observable.ref,
@@ -140,12 +129,6 @@ export class Application {
     this.i18n.on('languageChanged', (lng) => {
       this.apiClient.auth.locale = lng;
     });
-  }
-
-  private initRequireJs() {
-    this.requirejs = getRequireJs();
-    defineGlobalDeps(this.requirejs);
-    window.define = this.requirejs.define;
   }
 
   private addDefaultProviders() {

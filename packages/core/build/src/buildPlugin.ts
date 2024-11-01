@@ -277,7 +277,7 @@ export async function buildPluginServer(cwd: string, userConfig: UserConfig, sou
 
   await tsupBuild(userConfig.modifyTsupConfig({
     entry: serverFiles,
-    splitting: false,
+    splitting: true,
     clean: false,
     bundle: false,
     silent: true,
@@ -331,7 +331,7 @@ export async function buildPluginClient(cwd: string, userConfig: UserConfig, sou
       sourcemap,
       lib: {
         entry,
-        formats: ['umd'],
+        formats: ['es'],
         name: packageJson.name,
         fileName: () => outputFileName,
       },

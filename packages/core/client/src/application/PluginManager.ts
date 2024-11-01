@@ -57,7 +57,6 @@ export class PluginManager {
     const res = await this.app.apiClient.request({ url: 'pm:listEnabled' });
     const pluginList: PluginData[] = res?.data?.data || [];
     const plugins = await getPlugins({
-      requirejs: this.app.requirejs,
       pluginData: pluginList,
       devDynamicImport: this.app.devDynamicImport,
     });

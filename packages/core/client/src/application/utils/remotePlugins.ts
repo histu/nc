@@ -10,14 +10,14 @@
 import type { DevDynamicImport } from '../Application';
 import type { Plugin } from '../Plugin';
 import type { PluginData } from '../PluginManager';
-import type { RequireJS } from './requirejs';
 
 /**
  * @internal
  */
 export function defineDevPlugins(plugins: Record<string, typeof Plugin>) {
   Object.entries(plugins).forEach(([packageName, plugin]) => {
-    window.define(`${packageName}/client`, () => plugin);
+    // window.define(`${packageName}/client`, () => plugin);
+    console.error('TO BE IMPLEMENTED!')
   });
 }
 
@@ -25,35 +25,11 @@ export function defineDevPlugins(plugins: Record<string, typeof Plugin>) {
  * @internal
  */
 export function definePluginClient(packageName: string) {
-  window.define(`${packageName}/client`, ['exports', packageName], function (_exports: any, _pluginExports: any) {
-    Object.defineProperty(_exports, '__esModule', {
-      value: true,
-    });
-    Object.keys(_pluginExports).forEach(function (key) {
-      if (key === '__esModule') return;
-      if (key in _exports && _exports[key] === _pluginExports[key]) return;
-      Object.defineProperty(_exports, key, {
-        enumerable: true,
-        get: function () {
-          return _pluginExports[key];
-        },
-      });
-    });
-  });
+
+  console.error("Was  trying to define plugin module!")
 }
 
-/**
- * @internal
- */
-export function configRequirejs(requirejs: any, pluginData: PluginData[]) {
-  requirejs.requirejs.config({
-    waitSeconds: 120,
-    paths: pluginData.reduce<Record<string, string>>((acc, cur) => {
-      acc[cur.packageName] = cur.url;
-      return acc;
-    }, {}),
-  });
-}
+
 
 /**
  * @internal
@@ -83,10 +59,8 @@ export function processRemotePlugins(pluginData: PluginData[], resolve: (plugins
  * @internal
  */
 export function getRemotePlugins(
-  requirejs: any,
   pluginData: PluginData[] = [],
 ): Promise<Array<[string, typeof Plugin]>> {
-  configRequirejs(requirejs, pluginData);
 
   const packageNames = pluginData.map((item) => item.packageName);
   packageNames.forEach((packageName) => {
@@ -94,12 +68,11 @@ export function getRemotePlugins(
   });
 
   return new Promise((resolve, reject) => {
-    requirejs.requirejs(packageNames, processRemotePlugins(pluginData, resolve), reject);
+    console.error("was loading remote plugins")
   });
 }
 
 interface GetPluginsOption {
-  requirejs: RequireJS;
   pluginData: PluginData[];
   devDynamicImport?: DevDynamicImport;
 }
@@ -108,7 +81,7 @@ interface GetPluginsOption {
  * @internal
  */
 export async function getPlugins(options: GetPluginsOption): Promise<Array<[string, typeof Plugin]>> {
-  const { requirejs, pluginData, devDynamicImport } = options;
+  const { pluginData, devDynamicImport } = options;
   if (pluginData.length === 0) return [];
 
   const res: Array<[string, typeof Plugin]> = [];
@@ -132,8 +105,7 @@ export async function getPlugins(options: GetPluginsOption): Promise<Array<[stri
   }
 
   if (res.length === 0) {
-    const remotePluginList = await getRemotePlugins(requirejs, remotePlugins);
-    res.push(...remotePluginList);
+    console.error("was trying to import plugins")
   }
 
   return res;
